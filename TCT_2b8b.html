@@ -1,0 +1,2221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>TCT Geo</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+    <link href='css/styles1a.css' rel='stylesheet' />
+    <link href='css/TCT_styles_1b.css' rel='stylesheet' />
+
+    <!-- not sure that this is needed -->
+    <script src='https://api.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
+
+    <link rel="icon" type="image/png" href="images/TCT_logo_100x118.png" sizes="32x32" />
+
+    <script>
+      FontAwesomeConfig = { searchPseudoElements: true };
+    </script>
+
+    <script src="settings_2b2.js"></script>
+
+    <script src="makeGeoJSON.js"></script>
+
+    <script src="processGPS1i.js"></script>
+
+
+    <script src="geoJSON/parcelsTCT_2b1.js"></script>
+    <script src="geoJSON/parcelsTCTfuture_2b1.js"></script>
+
+    <script src="geoJSON/parcelsToT_2b1.js"></script>
+    <script src="geoJSON/trails_2b3.js"></script>
+    <script src="geoJSON/gridlines_2b1.js"></script>
+    <script src="geoJSON/borders_2b1.js"></script>
+    <script src="geoJSON/specialFeatures_1a.js"></script>
+
+    <script src="geoJSON/littlePametFarm_1a.js"></script>
+
+    <script src="TCT_functions_2b6.js"></script>
+    <script src="TCT_coordinatesHTML.js"></script>
+    <script src="TCT_adjacent_2b2.js"></script>
+    <script src="slideshow_1a2.js"></script>
+
+    <script src="includes/_uri_related2d.js"></script>
+    <script src="includes/ordinal.js"></script>
+    <script src="includes/geometry_2b1.js"></script>
+    <script src="includes/grid.js"></script>
+    <script src="includes/geoFunctions_2b1.js"></script>
+    <script src="includes/helpers2a3d.js"></script>
+
+
+
+    <script src="dist/turf.min.js"></script>
+
+<!--
+    <script defer src="dist/fontawesome-pro-5.0.13/svg-with-js/js/fontawesome-all.js"></script>
+
+    https://turfjs-builder.herokuapp.com/
+-->
+    <script src="dist/turf_FriMay242019.min.js"></script>
+
+
+
+    <!-- https://github.com/lukasmartinelli/mapbox-gl-inspect -->
+    <script src='http://mapbox-gl-inspect.lukasmartinelli.ch/dist/mapbox-gl-inspect.min.js'></script>
+    <link href='http://mapbox-gl-inspect.lukasmartinelli.ch/dist/mapbox-gl-inspect.css' rel='stylesheet' />
+
+<style>       
+
+import distance from "@turf/distance";
+import { Feature, FeatureCollection, GeometryCollection, LineString, MultiLineString, Units } from "@turf/helpers";
+import { segmentReduce } from "@turf/meta";
+
+</style>
+
+</head>
+<body>
+
+<!-- INCLUDE 2 LINES BELOW TO ADD DIRECTION CAPABILITIES
+<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v3.1.3/mapbox-gl-directions.js'></script>
+<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v3.1.3/mapbox-gl-directions.css' type='text/css' />
+SEE: 
+https://www.mapbox.com/mapbox-gl-js/example/mapbox-gl-directions/
+https://github.com/mapbox/mapbox-gl-directions
+http://project-osrm.org/
+https://www.openstreetmap.org/#map=4/38.01/-95.84
+INSPECT: with Chrome browser to find div id, so it can be positioned, hidden, etc.
+-->
+
+<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
+<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.9/mapbox-gl-draw.js'></script>
+
+<!--
+<script src='https://api.mapbox.com/v4/mapbox.terrain-rgb/{z}/{x}/{y}.pngraw?access_token=pk.eyJ1IjoiYmVib3lsZSIsImEiOiJjaW11MGd2aDIwMjNydjdra213cDRzc2d6In0.XcH2BA45KYJEKHbRzIcFsg'></script>
+-->
+
+<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.9/mapbox-gl-draw.css' type='text/css'/>
+
+<div id="mapTitle">Truro Conservation Trust</div>
+<!-- TCT_logo_380x448.png -->
+<div id="TCT_logo"></div>
+
+<div id="gpsFile">
+    <input type="file" name="file" id="gpsFileInput">
+    <!--
+    <input type="button" name="refreshFile" id="refreshFile" value="Refresh">
+    -->
+    <input type="button" name="gpsFileHelp" id="gpsFileHelpBtn" value="Help" onclick='toggleGpsFileHelp()'>
+
+</div>
+
+
+<div id="screenFile">
+    <input type="file" name="file" id="screenFileInput">
+
+
+    <input type="text" id="screenFileWidth" value="1000" size=5>
+
+
+    <button type=button onclick='screenFileDisplay()'>Display</button></br>
+
+    <div id="lonLatInput">
+        <input type="text" id="screenCoordLon" placeholder="longitude">
+        <input type="text" id="screenCoordLat" placeholder="latitude">
+        <div id="screenCoordInstruct">Enter for at least 2 points, then click on the image</div>
+    </div>
+</div>
+
+<!--
+<img id="screenImg" src="" width="500">
+-->
+<img id="screenImg">
+<div id="screenCoords"></div>
+
+<div id="menu"></div>
+<div id="helpText"></div>
+<div id='map'></div>
+<div id='map2'></div>
+
+<nav id="legend"></nav>
+<nav id="teams"></nav>
+
+<div id="data"></nav>
+<div id='distance' class='distance-container'></div>
+<div id='inspectionForm' class='inspectionForm-container'></div>
+<!-- this is the Add/Remove SATELLITE button
+<div id='remover'>Add satellite</div>
+-->
+
+<div id='controlBar'>  
+
+     <button id='togglePopups' class='buttonOff menu2' onclick='togglePopups()'>Popups</button>
+     <button id='toggleDrawing' class='buttonOn' onclick='toggleDrawing()'>Draw</button>
+     <!--
+     <button id='toggleLegend' class='buttonOn' onclick='toggleLegend()'>Legend</button>
+ -->
+<!--
+     <button id='toggleHelp' class='buttonOff' onclick='toggleHelp()'>Help</button>
+-->
+     <button id='toggleMeasureDistance' class='buttonOff' onclick='toggleMeasureDistance()'>Measure</button>
+
+     <button id='menuImportId' class='buttonOff' onclick='toggleImport()'>Import</button>
+
+     <button id='menuScreenId' class='buttonOff' onclick='toggleScreen()'>Digitize</button>
+<!--
+    <span class='filter-ctrl'>
+        <input id='filter-input' type='text' name='filter' placeholder='Filter by Id'>
+    </span>
+    <span class='filter1-ctrl'>
+        <input id='filter1-input' type='text' name='filter1' placeholder='UnFilter by Id'>
+    </span>
+-->
+<!--
+     <small><span id='showPopupsId'></span></small>
+-->
+
+</div>
+
+<div id='documentsBar'>  
+
+
+    <button class='buttonOff'>
+    <a href='http://truroconservationtrust.org/wp-content/uploads/2018/09/TCT_Fee_Simple_CRs_thru_June_22_2018.pdf' target='_sheet'>Land List</a>
+    </button>
+
+    <button class='buttonOff'>
+    <a href='http://truroconservationtrust.org/?page_id=227' target='_map'>Map</a>
+    </button>
+
+    <button class='buttonOff'>
+    <a href='https://www.axisgis.com/truroma/' target='_assessor'>Assessor</a>
+    </button>
+
+     <button id='reportBtn' class='buttonOff' onclick='reportBtn("signs")'>Signs</button>
+     <button id='reportBtn' class='buttonOff' onclick='reportBtn("TCT","Cca")'>TCT Lands</button>
+     <button id='reportBtn' class='buttonOff' onclick='reportBtn("TCT","ap")'>Prospects</button>
+
+
+</div>
+
+
+
+
+
+<div>
+
+
+        <div id='searchPromptModalDiv'></div>
+        <div id='searchPromptModalCancel'></div>
+        <div id='searchPromptModalOK'></div>
+        <div id='searchPromptModalHelp'></div>
+
+<div id='menuIcons'>
+
+    <span class=''>
+        <img id='menu-ctrl' onclick="toggleDiv('controlBar')" src="icons/burger-icon2.png" title="menu">
+    </span>
+
+    <span class=''>
+        <img id='layers-ctrl' onclick="toggleDiv('menu')" src="icons/layers-512.png" title="layers">
+    </span>
+
+    <span class=''>
+        <img id='documents-ctrl' onclick="toggleDiv('documentsBar')" src="icons/Document_black-512.png" title="resources">
+    </span>
+
+    <span class=''>
+        <img id='search-ctrl' onclick="searchClicked()" src="icons/search/basicSearch-icon.png" title="search">
+    </span>
+
+    <span class=''>
+        <img id='slideshow-ctrlTruro' onclick="launchSlideshowTruro()" src="icons/slideshow3.png" title="slideshow">
+    </span>
+</div>
+
+<!--
+    <span class=''>
+        <img id='slideshow-ctrlNY' onclick="launchSlideshowNY()" src="icons/slideshow3.png" title="slideshow">
+    </span>
+-->
+
+
+
+    <div id='satellite-ctrl' class=''>
+        <img id='satellite-ctrl-img' onclick="toggleSatellite('satellite')" src="icons/satellite.png" title="click to change to Map view">
+    </div>
+    <div id='map-ctrl' class=''>
+        <img id='map-ctrl-img' onclick="toggleSatellite('map')" src="icons/map.png" title="click to change to Satellite view">
+    </div>
+</div>
+
+<div id='coordinatesDiv'>
+    <!-- current cursor -->
+     <small><span id='coordinatesIdCursor'  class='coordinatesCursor'></span></small>
+     <!-- clicked lng,lat -->
+     <small><span id='coordinatesIdClicked' class='coordinatesClicked'></span></small>
+     <!-- x y screen -->
+     <small><span id='coordinatesIdXY'  class='coordinatesXY'></span></small>
+</div>
+
+<div class='calculation-box' id='calcs-box'>
+    <p>Draw using the tools.</p>
+    <div id='calculated-area'></div>
+</div>
+
+<div class='coords-box' id='coords-box'>
+    <p>Drawn coordinates:</p>
+    <div id='drawnCoordinates'></div>
+</div>
+
+<div id='zoomDiv'>     
+    <span id='zoomId'></span>
+</div>
+
+
+<div id='map-overlay-container'>
+    <div id='location-title'></div>
+    <div id='location-description'></div>
+    <div id='location-link'>
+        <a target='_blank' href='http://truroconservationtrust.org/'>TCT website</a>
+    </div>
+    <div id='location-images'></div>
+</div>
+
+<div id='gameKeyHelp'></div>
+
+
+<div id='gpsFileHelpDiv'>
+    <h3>Importing from the GPS Recorder JSON file</h3>
+
+    <h4>Commands</h4>
+    <p>Using the text editor, insert additional lines with commands from the list below.</p>
+    <h4>Displaying GPS points</h4>
+    <ul>
+        <li>~id= : for trails, this should be id=trails_TRAILSETname</li>
+        <li>~radius=6 : set the radius of the points below</li>
+        <li>~color=green : set the color of the points below</li>
+        <li>~offset -0.00001 0.00002 : offset points below by lon lat amounts shown</li>
+        <li>~double : double the number of dots by interpolating between pairs</li>
+        <li>~single : single dots only</li>
+        <li>~addText : future: add text at the coordinates specified</li>
+    </ul>
+
+    <h4>Measuring along a string of points</h4>
+    <ul>
+        <li>~measureStart : start measuring the length of the points as a line</li>
+        <li>~measureStop : stop measuring and display the measured length<br>~measureStop -0.00001 0.00002 y 5 is the default
+            <ul>
+                <li>display the length at the lon lat shown, or<br>offset from the midpoint if lon is less than 1.0</li>
+                <li>unit of measure (y=yds, f=ft, k=km, m=mi(les)</li>
+                <li>round to places (if 5 or 10 and yds, then round to nearest 5 or 10)</li>
+            </ul>
+    </ul>
+
+    <h4>Debugging</h4>
+    <ul>
+        <li>//... : single comment line</li>
+        <li>...// : embedded comment at end of a line</li>
+        <li>/* ... */ : block of comment lines</li>
+        <li>~labelsOn : turn on extra labels on points</li>
+        <li>~labelsOff : turn off extra labels on points</li>
+        <li>END : end of commands and data</li>    
+    </ul>
+
+</div>
+
+
+<script>
+
+
+/* TODO
+
+Sum:
+Count of parcels
+Acres
+  Upland
+  Wetland
+
+By
+   Fee Simple
+   CR
+
+By Habitat
+
+By Year
+
+*/
+
+
+
+
+// global objects
+var globals = {};
+// parameters set
+globals.params = {};
+
+globals.params.url = window.location.href;  // the url of this page
+globals.params.pathname = window.location.pathname;
+//alert(globals.params.pathname);
+
+// look for ? location
+globals.params.urlPlain = globals.params.url;
+var ii = globals.params.url.indexOf('?');
+if (ii>0) globals.params.urlPlain = globals.params.url.substring(0,ii);
+//alert(globals.params.urlPlain);
+
+// OLD
+
+
+// state variables
+globals.state = {};
+globals.state.flying = false;  // true if map is in the process of flying to a spot
+
+// legend location
+globals.params.legend = {};
+
+// teams location
+globals.params.teams = {};
+globals.params.teams.list = "";   // 
+globals.params.teams.highlight;  // true if highlighting team territories
+
+globals.params.status  = {};
+globals.params.console = {};    // false == quiet the console for .level
+
+
+// BEB's
+mapboxgl.accessToken = 'pk.eyJ1IjoiYmVib3lsZSIsImEiOiJjaW11MGd2aDIwMjNydjdra213cDRzc2d6In0.XcH2BA45KYJEKHbRzIcFsg';
+
+// Dan's:  This is needed for switching on/off SATELLITE images
+//mapboxgl.accessToken = 'pk.eyJ1IjoiZGFuc3dpY2siLCJhIjoiY2l1dTUzcmgxMDJ0djJ0b2VhY2sxNXBiMyJ9.25Qs4HNEkHubd4_Awbd8Og';
+
+
+
+    // the popup text box, with more global scope
+    var popupDodad;
+
+
+    var mapCenterFly = [];
+
+    //
+    // lng,lat to zoom to
+    //
+    globals.params.lnglat = getParameter("ll");
+    console.info("getParameter globals.params.lnglat=",globals.params.lnglat)
+    //alert("globals.params.lnglat",globals.params.lnglat, mapZoom);
+
+    if (globals.params.lnglat) {
+        var commaIndex = globals.params.lnglat.indexOf(",");
+        mapCenterFly[0] = Number(globals.params.lnglat.substring(0,commaIndex));
+        mapCenterFly[1] = Number(globals.params.lnglat.substring(commaIndex+1));
+    }
+
+    // map's bounds
+    var bounds = [];
+    // https://www.mapbox.com/mapbox-gl-js/example/restrict-bounds/
+
+/*
+    bounds = [
+        globals.params.boundSW,  // Southwest coordinates
+        globals.params.boundNE   // Northeast coordinates
+    ];
+*/
+
+    var map, mapStyle;
+    var mapSat;  // holds the satellite map object
+
+/*
+    map = new mapboxgl.Map({
+        container: 'map',
+        //style: 'mapbox://styles/mapbox/light-v9',    // lighter version
+        //style: 'mapbox://styles/mapbox/satellite-v9. // satellite version
+
+        // default version for TCT map
+        style: "mapbox://styles/mapbox/outdoors-v10",
+
+        // this is new style add 20181023
+        //style: "mapbox://styles/mapbox/satellite-streets-v10", // satellite version
+
+        // style needed for SATELLITE Add/Remove option from DanS. (DOESN'T SUPPORT outdoors-v10 as underlayer)
+        // style: 'mapbox://styles/danswick/cilnegnzr00439gkf7urxz0xk', //stylesheet location
+
+        center: mapCenter,
+        options: mapOptions,
+        //maxBounds: bounds,  // sets bounds on map. (comment out if not wanted)
+        zoom: 12.5,
+        attributionControl: false   // https://www.mapbox.com/mapbox-gl-js/api/#attributioncontrol
+
+
+
+    });
+*/
+
+
+// PHOTOS dropbox link 
+// https://www.dropbox.com/sh/7dbgfhji5j88ql5/AACs5cPbt7AiVtyTji7Hwvq-a?dl=0
+
+// ELEVATION. https://blog.mapbox.com/global-elevation-data-6689f1d0ba65
+
+
+//
+// READ IN URI PARAMETERS HERE
+
+
+
+    // we now need to define these here since we create the map before all is loaded
+    // Ideally, we wait until load, 
+    // then load settings,
+    // then create the map, 
+    // then test for a fly to specified by ll
+
+    globals.params.initCenter = [-70.068, 42.01];  // inital center
+    globals.params.initZoom = 12.5;  // inital zoom
+    globals.params.initPitch = 45;
+    globals.params.initBearing = -20;
+    globals.params.mapStyleDefault = 'outdoors-v10';
+
+    globals.params.zoomOnLatLng = 17;  // zoom level upon flying via ll argument
+
+    var mapOptions = {};
+    mapOptions.minZoom = 13;
+    var mapCenter = globals.params.initCenter;
+    var mapZoom = globals.params.initZoom;
+
+    // map style
+    globals.params.mapStyle = getParameter("mapstyle");
+    if ( globals.params.mapStyle ) {
+        mapStyle = 'mapbox://styles/mapbox/'+globals.params.mapStyle ;
+        createMap(mapStyle, mapCenter, mapZoom, mapOptions, globals.params.initPitch, globals.params.initBearing);
+    }
+    else {
+        //createMap('mapbox://styles/mapbox/light-v9',mapCenter,mapZoom,mapOptions);
+        createMap('mapbox://styles/mapbox/'+globals.params.mapStyleDefault, mapCenter, mapZoom, mapOptions, globals.params.initPitch, globals.params.initBearing);
+        //createMap('mapbox://styles/mapbox/satellite-v9',mapCenter,mapZoom,mapOptions);
+    }
+        
+    if (globals.params.lnglat) {
+        console.log("flyingToCoord",mapCenterFly,globals.params.zoomOnLatLng);
+        flyingToCoord(map,mapCenterFly,globals.params.zoomOnLatLng);
+    }
+
+
+//
+// LPF
+//
+var LPFparcelsLen;  // number of parcels
+var statusLabels;
+var statusFilter;
+
+
+/*
+You need to define the a Point representing the labels for your polygons and use a Symbol layer. One way to generate the label points is https://github.com/mapbox/polylabel
+*/
+
+/*
+status:
+c = conserved conservation restriction CR
+C = conserved fee simple
+a = active discussion
+p = prospect
+t = Town of Truro
+T = Town ConsComm
+g = graveyard Cemetary
+r = resident
+x = not a prospect
+
+*/
+
+
+globals.params.legendActive = "#42"; // legend for the "a" status
+
+globals.params.status = {};  // feature property: status attributes 
+
+
+var idCoord = "";
+var originCircle;
+var originCircleStack = [];
+var draw;  // for drawing controls
+
+var showPopups = false;
+var showDrawing = true;
+var showLegend = true;
+var showLabels = true;
+var showHelp = true;
+var showMeasureDistance = false;
+var showSatellite = false;
+var showLayers = false;
+
+var TCTparcelsLen;  // number of parcels
+var TCTlabels = {};
+var ToTparcelsLen; //    = ToTparcels.length;  // number of parcels
+var ToTlabels = {};
+
+
+var filterInput = document.getElementById('filter-input');
+var filter1Input = document.getElementById('filter1-input');
+
+var strWindowContent = "";
+
+//
+// FOR CLICK POINT COORDINATES
+//
+var clickedCoordsContainer = document.getElementById('coordinatesIdClicked');
+clickedCoordsContainer.style.display = 'none';
+
+//
+// FOR DISTANCE MEASURING
+//
+var distanceContainer = document.getElementById('distance');
+//distanceContainer.innerHTML = 'Click Map Points to Measure';
+distanceContainer.style.display = 'none';
+
+// GeoJSON object to hold our measurement features
+var geojson = {
+    "type": "FeatureCollection",
+    "features": []
+};
+// Used to draw a line between points
+var linestring = {
+    "type": "Feature",
+    "geometry": {
+        "type": "LineString",
+        "coordinates": []
+    }
+};
+
+var clickedArray = [];
+var clickRecord = false;
+var clickDone = false;
+var clickSave = false;
+
+var screenImgObj = {};
+var clickedArrayCoords = [];
+var computedArrayCoords = [];
+
+//
+// ########################### START OF ON.LOAD FUNCTION ###########################
+// ########################### START OF ON.LOAD FUNCTION ###########################
+// ########################### START OF ON.LOAD FUNCTION ###########################
+// ########################### START OF ON.LOAD FUNCTION ###########################
+// ########################### START OF ON.LOAD FUNCTION ###########################
+// ########################### START OF ON.LOAD FUNCTION ###########################
+// ########################### START OF ON.LOAD FUNCTION ###########################
+// ########################### START OF ON.LOAD FUNCTION ###########################
+// ########################### START OF ON.LOAD FUNCTION ###########################
+// ########################### START OF ON.LOAD FUNCTION ###########################
+//
+map.on('load', function () {
+
+    document.getElementById('gpsFileInput').onchange = function(){
+            //console.log("~this.files",this.files);
+        var file = this.files[0];
+            console.log("~file gpsFileInput",file);
+        readGPSfile(file);
+    };
+
+
+    document.getElementById('screenFileInput').onchange = function(){
+            //console.log("~this.files",this.files);
+        var file = this.files[0];
+            console.log("~file screenFileInput",file);
+
+            // http://jsfiddle.net/Bwj2D/11/
+        //<img id="screenImg" src=""  width="500">
+
+        var x = document.getElementById("screenImg").src;
+        //document.getElementById("demo").innerHTML = x;
+        document.getElementById("screenImg").src == file;
+
+        var w = document.getElementById("screenFileWidth").value;
+            console.log("~file screenFileWidth",w);
+
+        document.getElementById("screenImg").width = w;
+        clickedArray.length = 0; // remove clicks from getting file name
+
+        screenImgObj.w = document.getElementById("screenImg").width;
+        screenImgObj.h = document.getElementById("screenImg").naturalHeight;
+        screenImgObj.t = document.getElementById("screenImg").top;
+        screenImgObj.l = document.getElementById("screenImg").left;
+            console.log("~file screenImgObj",screenImgObj);
+
+
+
+        //readGPSfile(file);
+    };
+
+    // right click
+    document.oncontextmenu = function () {
+      //alert('Right Click')
+      clickedArray.pop();
+      displayImageCoords();
+    }
+
+    // normal click
+    document.onclick = userClicked;  // calls the function userClicked()
+
+    function userClicked() {
+        var x = event.clientX;
+        var y = event.clientY;
+        console.log("userClicked",x,y);
+        if (x>=200 && y>=100 && clickRecord && x<=200+document.getElementById("screenImg").width) {
+            clickedArray.push([x,y]);
+
+            // are there lon/lat coords for this point?
+            var coord = readLonLat();
+            if (1==1 || coord) {
+                console.log("coord",coord[0],coord[1]);
+                clickedArrayCoords.push(coord); 
+            }
+            else {
+               clickedArrayCoords.push(false); 
+            }
+            displayImageCoords();
+        }
+        return;
+    }
+
+    function readLonLat() {
+        var coord = [];
+        coord[0] = Number(document.getElementById("screenCoordLon").value);
+        coord[1] = Number(document.getElementById("screenCoordLat").value);
+            console.log("readLonLat coord",coord[0],coord[1]);
+        if (coord[0]=="") {
+            coord = false;
+        }
+        document.getElementById("screenCoordLon").value = "";
+        document.getElementById("screenCoordLat").value = "";
+        return coord;
+    }
+
+function computeArrayCoords() {
+        console.log("clickedArrayCoords",clickedArrayCoords);
+
+        var computedArrayCoords = [];
+        var basePoint;
+        var clickedArrayCoordsCount = 0;
+        for (var i=0;i<clickedArray.length;i++) {
+
+            if (clickedArrayCoords[i]) {
+                clickedArrayCoordsCount++;
+
+                if (clickedArrayCoordsCount==1) {
+                    var x1 = Number(clickedArray[i][0]);
+                    var y1 = Number(clickedArray[i][1]);
+                    var lon1 = Number(clickedArrayCoords[i][0]);
+                    var lat1 = Number(clickedArrayCoords[i][1]);
+                    basePoint = i;
+                }
+                else if (clickedArrayCoordsCount==2) {
+                    var dx = Number(clickedArray[i][0]) - x1;
+                    var dy = Number(clickedArray[i][1]) - y1;
+                    var dlon = Number(clickedArrayCoords[i][0]) - lon1;
+                    var dlat = Number(clickedArrayCoords[i][1]) - lat1;
+                    var dlon_dx = dlon/dx;
+                    var dlat_dy = dlat/dy;
+
+
+                    break;
+                }
+
+            }
+
+        }
+        // if there aren't 2 points with lon/lat coords, return
+        if (clickedArrayCoordsCount<2) return false;
+
+        console.log("dx",dx,"dy",dy,"dlon",dlon,"dlat",dlat);
+        console.log("dlon_dx",dlon_dx,"dlat_dy",dlat_dy);
+
+        for (var i=0;i<clickedArray.length;i++) {
+
+            if (clickedArrayCoords[i]) {
+                // this coord was input, so just use the input coords
+                computedArrayCoords[i] = [];
+                computedArrayCoords[i][0] = Number(clickedArrayCoords[i][0]);
+                computedArrayCoords[i][1] = Number(clickedArrayCoords[i][1]);
+            }
+            else {
+                // need to compute the coords of this by interpolating from the base point
+                computedArrayCoords[i] = [];
+
+
+                console.log(i,"base xy",clickedArray[basePoint],"base coords",clickedArrayCoords[basePoint],"this xy",clickedArray[i]);
+
+                var dxThis = Number(clickedArray[i][0])-Number(clickedArray[basePoint][0]);
+                computedArrayCoords[i][0] = Number(clickedArrayCoords[basePoint][0]) + dlon_dx * dxThis ;
+
+                var dyThis = Number(clickedArray[i][1])-Number(clickedArray[basePoint][1]);
+                computedArrayCoords[i][1] = Number(clickedArrayCoords[basePoint][1]) + dlat_dy * dyThis ;
+
+                console.log(i,"dxThis",dxThis,"dyThis",dyThis);
+
+                computedArrayCoords[i][0] = round(computedArrayCoords[i][0],6);
+                computedArrayCoords[i][1] = round(computedArrayCoords[i][1],6);
+
+                console.log(i,"lon",computedArrayCoords[i][0],"lat",computedArrayCoords[i][1]);
+
+            }
+        }
+        console.log("computedArrayCoords",computedArrayCoords);
+        return computedArrayCoords;
+}
+
+
+
+
+
+
+    function displayImageCoords() {
+        console.log("clickedArray",clickedArray);
+        var str = "";
+        // first click is the one for the display button so skip it
+        for (var i=0;i<clickedArray.length;i++) {
+            console.log(i,clickedArray[i][0],clickedArray[i][1]); 
+            str += "x,y "+clickedArray[i][0]+", "+clickedArray[i][1]+"<br>";
+
+            if (clickedArrayCoords[i]) {
+                str += "<em>["+clickedArrayCoords[i][0]+", "+clickedArrayCoords[i][1]+"]</em><br>";    
+            }
+
+        }
+
+        if (!clickDone) {
+            str += "<button id='screenCoordsUndoBtn'>Undo</button>";
+            str += "<br>";
+            str += "<button id='screenCoordsDoneBtn'>Done</button>";
+        }
+        else {
+            str += "<button id='screenCoordsSaveBtn'>Save</button>";            
+        }
+        document.getElementById("screenCoords").innerHTML = str;
+
+        if (1==1|| !clickDone) {
+            screenCoordsUndoBtn.onclick = screenCoordsUndoBtnFn;
+            screenCoordsDoneBtn.onclick = screenCoordsDoneBtnFn;
+        }
+        if (1==1 || clickDone) screenCoordsSaveBtn.onclick = screenCoordsSaveBtnFn;
+
+        // add the computed coords in a format for copying
+        if (1==1 || clickSave) {
+                str += "<br>------<br>";
+                for (var i=0;i<clickedArray.length;i++) {
+                    str += "["+computedArrayCoords[i][0]+", "+computedArrayCoords[i][1]+"],<br>";    
+                } 
+        document.getElementById("screenCoords").innerHTML = str;
+        screenCoordsUndoBtn.onclick = screenCoordsUndoBtnFn;
+        screenCoordsDoneBtn.onclick = screenCoordsDoneBtnFn;
+        screenCoordsSaveBtn.onclick = screenCoordsSaveBtnFn;
+        }
+
+
+    }
+
+
+function screenCoordsUndoBtnFn() {
+    clickedArray.pop();
+    displayImageCoords();
+}
+
+function screenCoordsDoneBtnFn() {
+    clickRecord = false;
+    clickDone = true;
+    clickedArray[clickedArray.length] = clickedArray[0];
+    displayImageCoords();
+    //alert("DONE!");
+    var coords = computeArrayCoords();
+    console.log("screenCoordsDoneBtnFn",coords);
+    return coords;
+}
+
+function screenCoordsSaveBtnFn() {
+    clickSave = true;
+    displayImageCoords();
+    alert("SAVED!");
+}
+
+            //console.log("globals.params.unions",globals.params.unions);
+    loadSettings();         // load default settings
+            //console.log("globals.params.unions",globals.params.unions);
+    processParameters();    // load uri parameters
+            //console.log("globals.params.unions",globals.params.unions);
+
+    loadHelpText();
+
+    toggleableLayers(); // list of layers that can be toggled
+
+    addGridlines();         // add gridlines
+    //zoomThreshold = 12;
+    displayZoom();      // display the zoom info box
+
+
+
+
+    // THIS PLOTS THE DETAILS OF 42 CORN HILL ROAD
+    //plot42CHR();
+
+
+    /* INCLUDE LINES BELOW TO ADD DIRECTION CAPABILITIES
+    map.addControl(new MapboxDirections({
+        accessToken: mapboxgl.accessToken
+    }), 'top-left');  // note location of control can be specified in call
+    */
+
+    //
+    // switching on/off SATELLITE style. -- requires DanS styles and token, but we lose the hillshading, etc.
+    /*
+    var switchy = document.getElementById('remover');
+    switchy.addEventListener("click", function(){
+        switchy = document.getElementById('remover');
+        if (switchy.className === 'on') {
+            switchy.setAttribute('class', 'off');
+            map.setLayoutProperty('mapbox-mapbox-satellite', 'visibility', 'none');
+            switchy.innerHTML = 'Add satellite';
+        } else {
+            switchy.setAttribute('class', 'on');
+            map.setLayoutProperty('mapbox-mapbox-satellite', 'visibility', 'visible');
+            switchy.innerHTML = 'Remove satellite';
+        }
+        //alert(switchy.className);
+    });
+    */
+
+
+    //
+    // TCT parcel loading
+    //
+    pushTCTparcels();   // loads all TCT parcel numbers into TCTparcels array
+    addFutures();       // load in future parcles
+    // LPF parcels
+    console.log("load showLPF",globals.params.showLPF);
+    if (globals.params.showLPF) {
+        pushLPFparcels();
+        addLittlePametFarm();
+    }
+    TCTparcelsLen = TCTparcels.length;  // number of parcels
+    //
+    // ToT parcel loading
+    //
+    if (globals.params.showCemetaries) ToTparcels = ToTparcels.concat(cemetaries);
+        //console.log("cemetaries",cemetaries,ToTparcels);    
+    ToTparcelsLen = ToTparcels.length;  // number of parcels
+
+    // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.NavigationControl());
+
+    // https://github.com/lukasmartinelli/mapbox-gl-inspect
+    // shows inpsection control, but not active until clicked
+    // Depends on being in "dev" mode
+    if ( globals.params.dev ) {
+        map.addControl(new MapboxInspect({
+          showInspectMap: false
+        }));
+    }
+
+    if (globals.params.search) searchClicked(globals.params.search);
+       
+    // determine where legend will be shown
+    var el = document.getElementById("legend");
+    el.style.bottom = globals.params.legend.bottom + "px";
+    el.style.left = globals.params.legend.left + "px";
+    // display the legend
+    displayLegend(); 
+    // set the state that user has not just clicked on Legend
+    globals.state.legendClick = false;
+    el.style.cursor = 'pointer';
+    el.onclick = function() {
+        //alert("clicked on Legend");
+        // set the state that user has just clicked on Legend
+        globals.state.legendClick = true;
+        //alert(globals.state.legendClick);
+    };
+
+    /*
+    // determine where teams will be shown
+    var elTeams = document.getElementById("teams");
+    elTeams.style.bottom = globals.params.teams.bottom + "px";
+    elTeams.style.left = globals.params.teams.left + "px";
+    */
+
+    //
+    // this is how we can change the fill color of a layer
+    // in this case of the national_park
+    //
+    // do this only if this map style supports them
+    //
+    if (globals.params.mapStyle!="satellite-streets-v10" && globals.params.mapStyle!="light-v9") {
+            //alert(mapStyle + " " +globals.params.mapStyle);
+        map.setPaintProperty('national_park', 'fill-color', 'tan');
+        map.setPaintProperty('national_park-outline', 'line-color', 'tan');
+        map.setPaintProperty('national_park-tint-band', 'line-color', 'lightgray');
+        map.setPaintProperty('national_park-tint-band', 'line-width', 0);
+        map.setLayoutProperty('national_park-tint-band', 'visibility', 'none');
+
+        // meters to feet (contour lines)
+        // https://bl.ocks.org/malwoodsantoro/69a2f1527cb50a70198f624bb73525f7
+          map.setLayoutProperty('contour-label', 'text-field', ["to-string", ["*", [ "get", "ele"], 3.3]])
+
+
+
+        //
+        // add terrain tiles
+        // https://www.mapbox.com/mapbox-gl-js/example/hillshade/
+        // https://www.mapbox.com/mapbox-gl-js/style-spec/#layers-hillshade
+        // https://www.mapbox.com/help/access-elevation-data/#mapbox-terrain-rgb
+        //
+        map.addSource('dem', {
+            "type": "raster-dem",
+            "url": "mapbox://mapbox.terrain-rgb"
+        });
+
+
+        // add hillshading
+        map.addLayer({
+            "id": "hillshading",
+            "source": "dem",
+            "type": "hillshade",
+            'layout': {
+                'visibility': 'visible'
+            }
+            // insert below waterway-river-canal-shadow;
+            // where hillshading sits in the Mapbox Outdoors style
+            }, 
+            'waterway-river-canal-shadow',
+        );
+
+
+    }
+
+                if (1==0) {
+                    filterInput.addEventListener('keyup', function(e) {
+                        // If the input value matches a layerID set
+                        // it's visibility to 'visible' or else hide it.
+                        var value = e.target.value.trim();
+                        var layerId = value;
+
+                        // interpret the filter input as an actual Id of a layer
+                        map.setLayoutProperty(layerId, 'visibility', 'none');
+                        console.warn(layerId," is now hidden");
+                    });
+
+                    filter1Input.addEventListener('keyup', function(e) {
+                        // If the input value matches a layerID set
+                        // it's visibility to 'visible'.
+                        var value = e.target.value.trim();
+                        var layerId = value;
+                        // interpret the filter input as an actual Id of a layer
+                        map.setLayoutProperty(layerId, 'visibility', 'visible');
+                        console.warn(layerId," is now visible");
+                    });
+                }
+
+
+
+
+    //
+    // https://www.mapbox.com/vector-tiles/mapbox-terrain/#overview
+    //
+    // add contours
+    map.addSource('contours', {
+        type: 'vector',
+        url: 'mapbox://mapbox.mapbox-terrain-v2'
+    });
+    map.addLayer({
+        'id': 'contours',
+        'type': 'line',
+        'source': 'contours',
+        'source-layer': 'contour',
+        'layout': {
+            'visibility': 'visible',
+            'line-join': 'round',
+            'line-cap': 'round'
+        },
+        'paint': {
+            'line-color': '#666',
+            'line-width': .2
+        }
+    });
+
+
+
+
+    // Add geolocate control to the map.
+    // https://www.mapbox.com/mapbox-gl-js/example/locate-user/
+    //
+    var geolocate = new mapboxgl.GeolocateControl({
+        positionOptions: {
+            enableHighAccuracy: true
+        },
+        trackUserLocation: true
+    });
+    map.addControl(geolocate);
+    geolocate.on('geolocate', function(e) {
+      var lon = e.coords.longitude.toFixed(globals.params.precision);
+      var lat = e.coords.latitude.toFixed(globals.params.precision);
+      //var position = [lon, lat];
+      var str = "You are at "+lon+ ", "+lat;
+      console.log(str);
+      //document.getElementById('help').innerHTML = str;
+    });
+    // https://stackoverflow.com/questions/50877315/getting-mapbox-geolocation-coordinates-into-a-variable
+
+    //
+    // add a scale to map
+    //
+    var scale = new mapboxgl.ScaleControl({
+        maxWidth: 80,
+        unit: 'imperial'
+    });
+    map.addControl(scale);
+
+    // Don't use full screen control, it loses the data shown at the bottom absolute
+    // map.addControl(new mapboxgl.FullscreenControl());
+
+
+
+
+    //
+    // THIS LAYER IS FOR POINT DISTANCE MEASURING
+    //
+    map.addSource('geojson', {
+        "type": "geojson",
+        "data": geojson
+    });
+
+    // a circle as the point, with black outline and transparent center
+    map.addLayer({
+        id: 'measure-points',
+        type: 'circle',
+        source: 'geojson',
+        paint: {
+            'circle-radius': 4,
+            'circle-color': '#fff',
+            "circle-opacity": 0,
+            "circle-stroke-width": 1,
+            "circle-stroke-color": '#000'
+        },
+        filter: ['in', '$type', 'Point']
+    });
+    map.addLayer({
+        id: 'measure-lines',
+        type: 'line',
+        source: 'geojson',
+        layout: {
+            'line-cap': 'round',
+            'line-join': 'round'
+        },
+        paint: {
+            'line-color': '#000',
+            'line-width': 1
+        },
+        filter: ['in', '$type', 'LineString']
+    });
+
+
+//
+// some of the same functionality as 'click' event
+// would need to expand this more to mimic click event
+//
+  map.on('tap', function (e) {
+            var myPoint = map.unproject(e.point);
+            var x = myPoint.lng.toFixed(globals.params.precision);
+            var y = myPoint.lat.toFixed(globals.params.precision);
+            clickedCoordsContainer.style.display = 'block';
+            clickedCoordsContainer.innerHTML = "clicked "+x+ ", "+y;
+            //alert("tapped at",x,y);
+    });
+// https://developer.here.com/api-explorer/maps-js/v3.0/infoBubbles/position-on-mouse-click
+
+    //
+    // Listen for a click on the map, and update coordinates
+    // Then additional handling based on user action at the time:
+    //      nearby points
+    //      measuring
+    //      moving the legend
+    //
+    map.on('click', function(e) {
+
+
+        var layerIds = getLayerIds(map);
+                console.log("clicked ~~layerIds",layerIds);
+
+            var myPoint = map.unproject(e.point);
+            var x = myPoint.lng.toFixed(globals.params.precision);
+            var y = myPoint.lat.toFixed(globals.params.precision);
+            clickedCoordsContainer.style.display = 'block';
+            clickedCoordsContainer.innerHTML = "clicked "+x+ ", "+y;
+            console.log("clicked at",x,y);
+
+            // is the nearby points parameter enabled?
+            if (globals.params.near) {
+                console.log("globals.params.near",globals.params.near);
+                console.log("clicked ==",x,y);
+                // now we need to run through all parcels and check each coordinate
+                var nearbyParcels = [];
+
+                var layerIds = getLayerIds(map);
+                console.log("clicked ~~layerIds",layerIds);
+
+                var clickedCoords = [Number(x),Number(y)];
+                nearbyParcels = findNearbyParcels(layerIds,clickedCoords,globals.params.near);
+                displayNearby(nearbyParcels,"helpText",clickedCoords,globals.params.near);
+                displayGrid(clickedCoords);
+            }
+
+            // are we measuring distance?
+            // https://www.mapbox.com/mapbox-gl-js/example/measure/
+            else if (showMeasureDistance) {
+            //else if (globals.params.measureDistance && showMeasureDistance) {
+                map.getCanvas().style.cursor = 'crosshair';
+                var features = map.queryRenderedFeatures(e.point, { layers: ['measure-points'] });
+
+                // Remove the linestring from the group
+                // So we can redraw it based on the points collection
+                if (geojson.features.length > 1) geojson.features.pop();
+
+                // Clear the Distance container to populate it with a new value
+                distanceContainer.innerHTML = '';
+
+                // If a feature was clicked, remove it from the map
+                // So if you click on a point already added, it will be removed !!
+                if (features.length) {
+                    var id = features[0].properties.id;
+                    geojson.features = geojson.features.filter(function(point) {
+                        return point.properties.id !== id;
+                    });
+                } else {
+                    var point = {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                e.lngLat.lng,
+                                e.lngLat.lat
+                            ]
+                        },
+                        "properties": {
+                            "id": String(new Date().getTime())
+                        }
+                    };
+                    geojson.features.push(point);
+                }
+
+                if (geojson.features.length > 1) {
+                    linestring.geometry.coordinates = geojson.features.map(function(point) {
+                        return point.geometry.coordinates;
+                    });
+
+                    geojson.features.push(linestring);
+
+                    /*
+                    // Populate the distanceContainer with total distance
+                    var value = document.createElement('pre');
+                    value.textContent = 'Total distance: ' + turf.lineDistance(linestring).toLocaleString() + 'km';
+                    distanceContainer.appendChild(value);
+                    */
+
+                    var turfDistance = turf.lineDistance(linestring);
+                    // turf returns km, so multiply to get feet                    
+                    turfDistance = turfDistance*3280.84;  // feet per km
+                    // show miles if over 1 mile
+                    if (turfDistance>5280) {
+                        turfDistance = turfDistance/5280;
+                        // less than 10 miles
+                        if (turfDistance<10) {
+                            distanceContainer.innerHTML = '<b>Total distance: ' + turfDistance.toFixed(2) + ' miles</b>';
+                        }
+                        // more than 10 miles
+                        else {
+                            distanceContainer.innerHTML = '<b>Total distance: ' + turfDistance.toFixed(1) + ' miles</b>';
+                        }
+                    }
+                    // more than 1000 feet and less than 1 mile
+                    else if (turfDistance>999) {
+                        var tdMiles = turfDistance/5280;
+                        distanceContainer.innerHTML = '<b>Total distance: ' + turfDistance.toFixed(0) + ' feet <br>'+tdMiles.toFixed(2)+' miles</b>';
+                    }
+                    // under 1000 feet
+                    else {
+                        distanceContainer.innerHTML = '<b>Total distance: ' + turfDistance.toFixed(0) + ' feet</b>';
+                    }
+                }
+                map.getSource('geojson').setData(geojson);
+            }
+
+            // are we moving the Legend?
+            else if ( globals.state.legendClick ) {
+
+                // move the legend to the right with each click
+                globals.params.legend.left += 450;
+                // once far to the right, wrap back to left edge
+                if (globals.params.legend.left>=2000) globals.params.legend.left = 10;
+                el.style.left = globals.params.legend.left + "px";
+                // set state to have moved the Legend
+                globals.state.legendClick = false;
+            }
+
+    });
+
+    //
+    // Listen for mouse moving on the map, and update coordinates
+    //
+    map.on('mousemove', function(e) {
+            var myPoint = map.unproject(e.point);
+            var x = myPoint.lng.toFixed(globals.params.precision);
+            var y = myPoint.lat.toFixed(globals.params.precision);
+            document.getElementById('coordinatesIdCursor').innerHTML = "X: "+x+ ", Y: "+y;
+
+            // update X Y screen locations and size
+            var specs = deviceSpecs();
+            var xypixels = document.getElementById('coordinatesIdXY');
+            var xypixelsStr = "x: "+ e.point.x + ", y: "+ e.point.y + " px" + "<br>" + specs.innerWidth + " x " + specs.innerHeight + " inner";
+                xypixelsStr += "<br>" + specs.availWidth + " x " + specs.availHeight + " avail";
+            xypixels.innerHTML = xypixelsStr;
+    });
+
+    //
+    // instantiate fullscreen control
+    //
+    map.addControl(new mapboxgl.FullscreenControl());   
+
+    //
+    // instantiate the draggable draw functions and controls
+    //
+    draw = new MapboxDraw({
+      drawing: true,
+      displayControlsDefault: false,   // true exposes more controls, like a line and marker
+    //  use below if default above is false and fewer controls are desired
+      controls: {
+        line_string: true,
+        //lines: true,
+        polygon: true,
+        point: true,
+        trash: true,
+        combine_features: true,    
+        uncombine_features: true
+      }
+    });
+    map.addControl(draw);   // add controls to map
+
+    //
+    // establish listeners that show the area of a drawn polygon
+    //
+    map.on('draw.create', updateArea);
+    map.on('draw.delete', updateArea);
+    map.on('draw.update', updateArea);
+    // establish listeners that also show coordinates
+    map.on('draw.create', showCoords);
+    map.on('draw.delete', hideCoords);
+    map.on('draw.update', showCoords);
+
+
+
+    var idCoord = "";
+    var originCircle;
+    var originCircleStack = [];
+
+    var TCTparcelsArray = [];  // an array of parcel objects that will become features
+    var TCTcentersArray = [];
+    var TCTcentersArrayHash = {};
+    TCTcentersArrayHash.A = [];
+    TCTcentersArrayHash.B = [];
+    TCTcentersArrayHash.C = [];
+    TCTcentersArrayHash.D = [];
+    TCTcentersArrayHash["?"] = [];
+
+    var notGeocoded = [];  // array of TCT #'s not yet geocoded'
+    var teamFilter = globals.params.teams.list;
+/*
+    var statusFilter = globals.params.status.list;
+    statusFilter = "Ccapr";  // plugging this because globals not working
+        //alert("1586 "+globals.params.status.list+" "+statusFilter);
+        //alert(statusFilter);
+*/
+
+    statusFilter = globals.params.status.list;
+    //alert("statusFilter="+statusFilter+" globals.params.status.list="+globals.params.status.list);
+
+    //
+    // loop through all TCT parcels
+    // filter them by status, team
+    //
+    for (var i=0;i<TCTparcelsLen;i++) {
+        var n =     TCTparcels[i]; 
+        var obj = tct["id_"+n];  
+
+        if (obj===undefined) {
+            alert("TCT parcel "+n+" is not defined");
+            continue;
+        }
+
+        // this filters for certain status to plot
+        if (statusFilter.indexOf(obj.properties.status)==-1) {
+            //alert("TCT parcel "+n+" skipped - stauts = "+obj.properties.status);
+            continue;
+        }
+
+        var teamIndex = teamFilter.indexOf(obj.properties.team);
+            if (globals.params.console.log) console.log("PARCEL: ", n, obj.properties.team, teamIndex);
+
+        if (obj.properties.team!=undefined && obj.geometry.center!=undefined) {
+            var triplet = obj.geometry.center;
+            triplet[2] = n;
+            TCTcentersArrayHash[obj.properties.team].push(triplet);
+        }
+        else {
+            if (globals.params.console.warn) console.warn("bbox","TCTcentersArrayHash skipping",obj.properties.title,obj);
+        }
+
+        // skip parcels that do not pass the team filter
+        if ( teamFilter.length>0 && teamIndex == -1 ) {
+            continue;
+        }
+
+        // process and add this parcel, since it passed the filters
+        TCTparcelsArray.push(obj);
+
+        /*
+        for each of the teams
+        hash the hulls and different colore each
+        */
+
+        //
+        // check to see if there are signs on this parcel
+        //
+        if (obj.properties.signs != undefined) {
+            var numSigns = obj.properties.signs.length;
+            if (numSigns>0) console.log(numSigns," signs on ",n);
+            for (var jSign=0; jSign<numSigns; jSign++) {
+                console.log( "index "+jSign," sign is at ",obj.properties.signs[jSign] );
+                var signId = "TCT"+"-sign_"+n+"."+jSign;
+                //signId = "TCTsigns";
+                plotCircle(signId,5,'green',obj.properties.signs[jSign],.8);
+            }
+        }
+        else {
+            //console.log("NO"," signs on ",n);
+        }
+
+
+        if (obj.geometry.center!=undefined) {
+            // add to array of center points
+            TCTcentersArray.push(obj.geometry.center);
+        }
+        else {
+            var computedCenter = getCenter(obj);
+               console.log("bbox","computedCenter",computedCenter,obj);
+
+            if (computedCenter!=undefined) {
+                TCTcentersArray.push(computedCenter);
+            }
+            else {
+                console.warn("Skipping one parcel: No center available for ",obj.properties.title,obj);
+            }
+        }
+
+        // no coordinates geocoded yet?
+        if (obj.geometry.coordinates===undefined || obj.geometry.coordinates[0]===undefined || obj.geometry.coordinates[0].length == 0) {
+            console.log(n+ " is not geocoded");
+            notGeocoded.push(n);  // add this as not geocoded
+
+            // so let's add a circle at its center
+            if (obj.geometry.center!=undefined) {
+
+                var radius = 10*Math.sqrt(obj.properties.acres);
+                // plotCircle(n,radius,'hotpink',obj.geometry.center,.5);
+
+                // let's add a square about the size of the parcel's acres
+
+                var delta;
+                delta = radius*.00004;
+                var cx = obj.geometry.center[0];
+                var cy = obj.geometry.center[1];
+                obj.geometry.coordinates[0][0] = [ cx+2*delta, cy ];
+                obj.geometry.coordinates[0][1] = [ cx, cy+delta ];
+                obj.geometry.coordinates[0][2] = [ cx-2*delta, cy ];
+                obj.geometry.coordinates[0][3] = [ cx, cy-delta ];
+                obj.geometry.coordinates[0][4] = obj.geometry.coordinates[0][0];
+            }
+        }
+
+    }  // end for loop
+
+        console.log("bbox","notGeocoded",notGeocoded);
+        console.log("bbox","TCTcentersArrayHash",TCTcentersArrayHash);
+        console.log("bbox","globals.params.team.colors",globals.params.team.colors);
+
+    // TCT parcels is the first source
+    map.addSource("TCT", {
+        "type": "geojson",
+        "data": 
+            {
+                "type": "FeatureCollection",
+                "features": TCTparcelsArray
+            }
+    });
+
+                                        /*
+
+                                        // bounding box of just the first parcel in that Team
+                                        var geojsonObj = TCTparcelsArray[1];
+                                        var bbox = turf.bbox(geojsonObj);
+                                        var bboxPolygon = turf.bboxPolygon(bbox);
+                                                console.log("bbox","parcel",geojsonObj);
+                                                console.log("bbox","bbox",bbox);
+                                                console.log("bbox","bboxPolygon",bboxPolygon);
+
+
+                                        // TCTbbox becomes another source
+                                        map.addSource("TCTbbox", {
+                                            "type": "geojson",
+                                            "data": bboxPolygon
+                                        });
+                                        if (1==0) {
+                                            // plot that bounding box
+                                            map.addLayer({
+                                                "id": "TCT-bboxFill",
+                                                "type": "fill",
+                                                //"source": "TCTbbox",
+                                                "source": {
+                                                    "type": "geojson",
+                                                    "data": 
+                                                        {
+                                                        "type": "FeatureCollection",
+                                                        "features": [
+                                                            bboxPolygon
+                                                        ]
+                                                    }
+                                                },
+                                                "paint": {
+                                                    // https://blog.mapbox.com/data-driven-styling-for-fill-layers-in-mapbox-gl-js-80bb5292af4e
+                                                    //'fill-color': globals.params.team.colors[globals.params.teams.charAt(0)],
+                                                    'fill-color': "#888",
+                                                    "fill-opacity": .85
+                                                }
+                                            //,
+                                            //"filter": ["==", "$type", "Polygon"],
+                                            //"filter": ["==", "$type", "Polygon"],
+                                            //"filter": ["==", "$abc", "y"]
+                                            });
+                                        }
+                                        */
+
+
+var teamList = ["A","B","C","D"];
+var teamTally = {};   // hash of an array of totals by team
+teamTally["ALL"] = [0,0];
+
+var teamListLen = teamList.length;
+for (var t=0;t<teamListLen;t++) {
+    var aTeam = teamList[t];
+        console.log("bbox","aTeam",aTeam);
+
+    TCTcentersArray = TCTcentersArrayHash[aTeam];
+    teamTally[aTeam] = [TCTcentersArray.length,0];
+    teamTally["ALL"][0] = Number(teamTally["ALL"][0])+Number(teamTally[aTeam][0]);
+
+    var pointsCenterArray =[];
+    if (TCTcentersArray.length>=3) {
+
+        for (var i=0;i<TCTcentersArray.length;i++) {
+            pointsCenterArray.push(turf.point(TCTcentersArray[i]));
+        }
+
+        console.log("bbox","pointsCenterArray 0",t,pointsCenterArray);
+
+        // put in some pseudo points to influence the bounding concave team boundaries
+        if (t==0) { // A
+                    console.log("bbox","pointsCenterArray P",t,pointsCenterArray);
+            pointsCenterArray.push(turf.point([-70.06028,42.00575]));
+            pointsCenterArray.push(turf.point([-70.0775,42.03]));
+            pointsCenterArray.push(turf.point([-70.097,42.0345]));
+            pointsCenterArray.push(turf.point([-70.0926,42.0431]));
+            pointsCenterArray.push(turf.point([-70.1237,42.0521]));
+            pointsCenterArray.push(turf.point([-70.11364,42.04954]));
+            pointsCenterArray.push(turf.point([-70.0821,42.00775]));
+            pointsCenterArray.push(turf.point([-70.076,42.0085]));
+            pointsCenterArray.push(turf.point([-70.0646,42.0244]));
+            pointsCenterArray.push(turf.point([-70.054,42.0035]));
+            pointsCenterArray.push(turf.point([-70.0504,42.002]));
+        }
+        else if (t==1) {    // B
+            pointsCenterArray.push(turf.point([-70.0819,42.007]));
+            pointsCenterArray.push(turf.point([-70.0718,42.0065]));
+            pointsCenterArray.push(turf.point([-70.06045,42.0056]));
+            pointsCenterArray.push(turf.point([-70.0531,42.0028]));
+            pointsCenterArray.push(turf.point([-70.05055,42.00055]));
+            pointsCenterArray.push(turf.point([-70.0495,41.9981]));
+            pointsCenterArray.push(turf.point([-70.068,41.9948]));
+            pointsCenterArray.push(turf.point([-70.0804,41.9987]));
+        }
+        else if (t==2) { // C
+            pointsCenterArray.push(turf.point([-70.05175,41.9963]));
+            pointsCenterArray.push(turf.point([-70.0339 ,42.0033]));
+            pointsCenterArray.push(turf.point([-70.0252,42.0059]));
+            pointsCenterArray.push(turf.point([-70.0175,41.9957]));
+            pointsCenterArray.push(turf.point([-70.025  ,41.9942]));
+            pointsCenterArray.push(turf.point([-70.031  ,41.994]));
+            pointsCenterArray.push(turf.point([-70.0418,41.9924]));
+            pointsCenterArray.push(turf.point([-70.0684,41.9868]));
+        }
+        else if (t==3) { // D
+            pointsCenterArray.push(turf.point([-70.077,41.959]));
+            pointsCenterArray.push(turf.point([-70.045,41.986]));
+        }
+        //console.log("bbox","TCTcentersArray "+aTeam,TCTcentersArray);
+
+        console.log("bbox","pointsCenterArray 1",t,pointsCenterArray);
+
+        var points = turf.featureCollection(pointsCenterArray);
+
+        var optionsConcave = {'maxEdge': 16, 'units': 'miles' };
+        console.log("bbox","optionsConcave",optionsConcave);
+        var hullConcave;
+        //hullConcave = turf.concave(points, optionsConcave);
+        //hullConcave = turf.concave(points);
+
+        var concaveMiles = {};
+        concaveMiles.A = 1.30;
+        concaveMiles.B = .72;
+        concaveMiles.C = .9;
+        concaveMiles.D = 1.99;
+
+        hullConcave = turf.concave(points, concaveMiles[aTeam], 'miles');
+        // 2nd argument is longest edge in miles
+        console.log("bbox","team hullConcave",aTeam,hullConcave);
+
+/*
+        var hullConvex = turf.convex(points);
+        console.log("bbox","hullConvex",hullConvex);
+
+        var hull;
+        if (aTeam=="A" || aTeam=="C") {
+            console.log("bbox","hullConcave is used for team "+aTeam);
+            hull = hullConcave;
+        }
+        else {
+            console.log("bbox","hullConvex is used for team "+aTeam);
+            hull = hullConvex;
+        }
+*/
+            hull = hullConcave;
+
+        var useColor;
+        //useColor = globals.params.team.colors[globals.params.teams.charAt(0)];
+        useColor = globals.params.team.colors[aTeam];
+
+        var useOpacity;
+        useOpacity = globals.params.team.opacity[aTeam];
+
+        //console.log("bbox","hull",hull);
+        console.log("bbox","team",globals.params.teams);
+        console.log("bbox","color",useColor);
+        console.log("bbox","teams.highlight","globals.params.teams.list",globals.params.teams.highlight,globals.params.teams.list);
+
+    // show the hull of each team selected
+    if (globals.params.teams.highlight && globals.params.teams.list.indexOf(aTeam) >= 0) {
+            map.addLayer({
+                //"id": "TCT-bboxFillHull"+t,
+                "id": "TCT-team"+t,
+                "type": "fill",
+                //"source": "TCTbbox",
+                "source": {
+                    "type": "geojson",
+                    "data": 
+                        {
+                        "type": "FeatureCollection",
+                        "features": [ hull ]
+                    }
+                },
+                "paint": {
+                    // https://blog.mapbox.com/data-driven-styling-for-fill-layers-in-mapbox-gl-js-80bb5292af4e
+                    'fill-color': useColor,
+                    "fill-opacity": useOpacity 
+                }
+            });
+    }
+
+        /*
+                var optionsCluster = {numberOfClusters: 4};
+                var clustered;
+                //clustered = turf.clustersKmeans(points, optionsCluster);
+                console.log("bbox","clustersKmeans",clustered);
+        */
+
+    }
+    else {
+        alert('only '+TCTcentersArray.length+' parcels with centers');
+    }
+
+}
+        
+console.log("bbox","teamTally",teamTally);
+console.log("bbox","notGeocoded",notGeocoded);
+
+// display the team counts
+displayTeams(teamTally); 
+
+
+
+    var ToTparcelsArray = [];  // an array of parcel objects that will become features
+
+    for (var i=0;i<ToTparcelsLen;i++) {
+        var n =     ToTparcels[i]; 
+        var obj = tot["id_"+n];  
+        ToTparcelsArray.push(obj);
+    }
+
+    var LPFparcelsArray = [];  // an array of parcel objects that will become features
+    if (globals.params.showLPF) {
+        for (var i=0;i<LPFparcelsLen;i++) {
+            var n =     LPFparcels[i]; 
+            var obj = lpf["id_"+n];  
+            LPFparcelsArray.push(obj);
+            console.log("LPF",n);
+        }
+    }
+    else {
+            console.log("LPFparcelsArray",0);
+    }
+
+
+    // ToT becomes another source
+    map.addSource("ToT", {
+        "type": "geojson",
+        "data": 
+            {
+                "type": "FeatureCollection",
+                "features": ToTparcelsArray
+            }
+    });
+
+    //
+    // add all parcel polygons
+    // make a layer from the source TCT
+    //
+    map.addLayer({
+        "id": "TCT-fills",
+        "type": "fill",
+        "source": "TCT",
+        "paint": {
+            // https://blog.mapbox.com/data-driven-styling-for-fill-layers-in-mapbox-gl-js-80bb5292af4e
+            'fill-color': {
+             'property': 'status',
+             "type":"categorical",
+             'stops': globals.params.status.colors
+            },
+            "fill-opacity": {
+             'property': 'status',
+             "type":"categorical",
+             'stops': globals.params.status.opacities
+            },
+        },
+        "filter": ["==", "$type", "Polygon"],
+    });
+
+    map.addLayer({
+        "id": "ToT-fills",
+        "type": "fill",
+        "source": "ToT",
+        "paint": {
+
+            // this will fill with a pattern (need to comment out the fill-color property)
+            //'fill-pattern': 'garden-11',
+
+            // https://blog.mapbox.com/data-driven-styling-for-fill-layers-in-mapbox-gl-js-80bb5292af4e
+
+            'fill-color': {
+             'property': 'status',
+             "type":"categorical",
+             'stops': globals.params.status.colors
+            },
+            "fill-opacity": {
+             'property': 'status',
+             "type":"categorical",
+             'stops': globals.params.status.opacities
+            },        },
+        "filter": ["==", "$type", "Polygon"],
+    });
+
+    //
+    // add the border as a line type
+    //
+    map.addLayer({
+        "id": "TCT-boundaries",
+        "type": "line",
+        "source": "TCT",
+        "paint": {
+                'line-color': 'rgba(0, 0, 0, .25)',
+                //'line-width': 1
+                'line-width': {
+                     'property': 'status',
+                     "type":"categorical",
+                     'stops': globals.params.status.lines
+                }
+            },
+        //"filter": ["==", "$type", "Polygon"],
+    });
+    map.addLayer({
+        "id": "ToT-boundaries",
+        "type": "line",
+        "source": "ToT",
+        "paint": {
+                'line-color': 'rgba(0, 0, 0, .25)',
+                //'line-width': 1
+                'line-width': {
+                     'property': 'status',
+                     "type":"categorical",
+                     'stops': globals.params.status.lines
+                }
+            },
+        //"filter": ["==", "$type", "Polygon"],
+    });
+
+    // label the centers of each parcel
+    manageLabels(statusLabels);
+
+    // show access details
+    showAccess();
+
+    // show special feature points on the map
+    showSpecialFeatures();
+
+
+/*.  HOW TO USE AN IMAGE AS AN ICON
+
+    // use an image for the bench as the icon
+    // https://www.mapbox.com/mapbox-gl-js/example/add-image/
+
+    // https://gis.stackexchange.com/questions/219241/list-of-available-marker-symbols
+    // http://map.michelstuyts.be/icons/
+
+
+
+    //map.loadImage('images/bench.png', function(error, image) {
+
+    map.loadImage('https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Cat_silhouette.svg/400px-Cat_silhouette.svg.png', function(error, image) {
+
+        if (error) throw error;
+        map.addImage('bench', image);
+        map.addLayer({
+            "id": "trails-bench",
+            "type": "symbol",
+            "source": {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": [{
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [-70.04233, 41.99040]
+                        }
+                    }]
+                }
+            },
+            "layout": {
+                "icon-image": "bench",
+                "icon-size": 0.05       // ~20px
+            }
+        });
+    });
+
+*/
+    //
+    // add trails
+    //
+    // https://bl.ocks.org/danswick/7f76b15f7ef80391e933#index.html
+    //
+
+
+    //
+    // When a click event occurs on a feature in the states layer, open a popup at the
+    // location of the click, with description HTML from its properties.
+    //
+    map.on('click', 'TCT-fills', function (e) {
+        handleClick(e);
+    });
+    map.on('dblclick', 'TCT-fills', function (e) {
+        handleDblClick(e);
+    });
+
+    // similar click effects for ToT parcels
+    map.on('click', 'ToT-fills', function (e) {
+        handleClick(e);
+    });    
+    map.on('dblclick', 'ToT-fills', function (e) {
+        handleDblClick(e);
+    });    
+    //
+    // Change the cursor to a pointer when the mouse is over the states layer
+    //
+    map.on('mouseenter', 'TCT-fills', function (e) {
+        if (showPopups) handleMouseenter(e);
+    });
+    //
+    // Change it back to a pointer (default) when it leaves
+    //
+    map.on('mouseleave', 'TCT-fills', function (e) {
+        if (showPopups) handleMouseleave(e);
+    });
+
+    map.on('mouseenter', 'ToT-fills', function (e) {
+        if (showPopups) handleMouseenter(e,true);
+    });
+    map.on('mouseleave', 'ToT-fills', function (e) {
+        if (showPopups) handleMouseleave(e);
+    });
+    // mouseover effects for ToT parcels are only cursor changes
+
+
+    // detect movement
+    map.on('move', function() {
+        displayZoom();      // show the zoom level and new map center
+        setMapSatZoom();    // sync map2 to map
+    });
+
+    // display the zoom level
+    map.on('zoom', function() {
+        displayZoom();      // show the zoom level and new map center
+        setMapSatZoom();    // sync map2 to map
+    });
+
+
+
+
+/*
+    if (globals.params.search) {
+        var myCoords33 = findCoordById(globals.params.search);
+        flyingToCoord(map,myCoords33);
+    }
+*/
+
+    addTrails();     // add in trails (so they are on top)
+    addBorders();     // add in trails (so they are on top)
+
+    // determine adjacent parcels, and plot the union of them
+    if (globals.params.unions) {
+
+
+        // filter TCTparcels by globals.params.status.union (list of statuses to group)
+        var filteredTCTparcelsArray = filterParcelsByStatus(TCTparcelsArray,globals.params.status.union)
+
+
+        if (globals.params.includeTownLand) {
+            calculateAdjacency(map,filteredTCTparcelsArray,ToTparcelsArray);  // calculate adjaceny matrix of all parcels
+        }
+        else {
+            calculateAdjacency(map,filteredTCTparcelsArray);  // calculate adjaceny matrix of TCT parcels
+        }
+            //calculateAdjacency(map,ToTparcelsArray);  // calculate adjaceny matrix of all parcels
+    }
+
+    toggleDrawing();    // hide drawing controls
+    toggleDiv("mapTitle",false);    // hide the map title
+
+    gameKeys();  // setup game key help and key listeners
+    toggleDiv("gameKeyHelp",true);  // show the help
+
+
+    getLayers();  // just for reference in console.log
+
+
+});  // end of on load block
+//
+// ########################### END OF ON.LOAD FUNCTION ###########################
+// ########################### END OF ON.LOAD FUNCTION ###########################
+// ########################### END OF ON.LOAD FUNCTION ###########################
+//
+
+function filterParcelsByStatus(parcelsArray,statusList) {
+    var filteredArray = [];
+    var obj;
+    var status;
+        console.log("filterParcelsByStatus",parcelsArray,statusList);
+
+    for (var i=0;i<parcelsArray.length;i++) {
+        obj = parcelsArray[i];
+        status = obj.properties.status;
+
+            console.log("filterParcelsByStatus reading",i,status,"obj=",obj);
+
+
+        if (statusList.indexOf(status)>=0) {
+            filteredArray.push(obj);
+            console.log("filterParcelsByStatus pushing",i,obj);
+
+        }
+    }
+        console.log("filterParcelsByStatus filteredArray",filteredArray);
+    return filteredArray;
+}
+
+//
+// https://www.mapbox.com/mapbox-gl-js/example/mapbox-gl-draw/
+//
+function updateArea(e) {
+    var data = draw.getAll();
+            console.log("draw.getAll()",data);
+    var answer = document.getElementById('calculated-area');
+    var box = document.getElementById('calcs-box');
+
+    if (data.features.length > 0) {
+
+        var area = turf.area(data);  // returns in sq meters
+        if (area>0) {   // skip if a point was drawn
+            // restrict to area to 2 decimal points
+            var rounded_area = Math.round(area*100)/100;
+
+            var acres = area/4046.86;  // convert to acres
+            var rounded_acres = Math.round(acres*100)/100;
+
+            answer.innerHTML = '<p><strong>' + rounded_acres + '</strong> acres</p>';
+            box.style.height = 44+'px';
+        }
+
+    } else {
+        box.style.height = 30+'px';
+        answer.innerHTML = '';
+        if (e.type !== 'draw.delete') alert("Use the draw tools to draw a polygon!");
+    }
+
+    if (e===undefined) return; // just a general update without any feature in particular
+
+    console.log("updateArea e",e);
+    //var coords = e.features;
+
+    var coords = e.features[0].geometry.coordinates[0];
+    console.log("updateArea coords",coords);
+    console.log("updateArea e",e);
+}
+
+
+//
+// show/hide coords and calcs
+//
+function hideCoords() {
+    var box = document.getElementById('coords-box');
+    box.style.display = 'none';
+}
+function hideCalcs() {
+    var box = document.getElementById('calcs-box');
+    box.style.display = 'none';
+}
+function showCalcs() {
+    var box = document.getElementById('calcs-box');
+    box.style.display = 'block';
+}
+
+//
+// handlers for various mouse actions
+//
+function handleClick(e) {
+    console.log("click");
+    var myHTML = makeHTML(e,false);  // no coords
+    if (popupDodad!=undefined) popupDodad.remove();    // remove the popup if there from the mouseover
+
+    // only show the popup if we are not measuring
+    if (!showMeasureDistance) { 
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(myHTML)
+            .addTo(map);
+    }
+}
+function handleDblClick(e) {
+    console.log("dblclick");
+    var myHTML = makeHTML(e,true,true);
+    if (popupDodad!=undefined) popupDodad.remove();    // remove the popup if there from the mouseover
+
+console.warn("popupDodad e",e);
+console.warn("popupDodad e.features[0]",e.features[0]);
+
+    new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(myHTML)
+        .addTo(map);
+}
+function handleMouseenter(e,justCursor) {
+    if (justCursor===undefined) justCursor=false;
+    //console.log("mouseenter");
+    map.getCanvas().style.cursor = 'pointer';
+    // don't show popup if justCursor is true or the status is 'x'
+    if (!justCursor && e.features[0].properties.status!='x') {
+        var myHTML = makeHTML(e,false);
+        popupDodad = new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(myHTML);
+            popupDodad.addTo(map);   // add the popup
+    }
+}
+function handleMouseleave(e) {
+    //console.log("mouseleave");
+    map.getCanvas().style.cursor = 'default';
+    if (popupDodad!=undefined) popupDodad.remove();    // remove the popup
+}
+
+
+
+
+function inputInspection() {
+    var myForm = document.getElementById("inspectionForm");  
+
+    myForm.style.display = 'block';
+
+    var str = "<div draggable='true'>";
+    str += "<h5>INSPECTION REPORT</h5>"
+    //str += "<br>"
+    //str += "<br>"
+
+    str += "<input type='text' placeholder='date of inspection'></input>"
+    str += "<br>"
+    str += "<br>"
+
+    str += "<textarea id='reportComments' rows = '5' cols = '30' name = 'description' placeholder='Comments on the inspection'></textarea>";
+    str += "<br>"
+    str += "<input type='text' placeholder='photos?'></input>"
+    str += "<br>"
+    str += "<br>"
+
+    str += "<button' id='submitReportBtn' placeholder='inspectionSubmit' onclick='submitReport()'>SUBMIT</button>"
+
+     str += "&nbsp;";
+          str += "&nbsp;";
+
+    str += "<button' id='clearReportBtn' placeholder='inspectionSubmit' onclick='clearReport()'>CLEAR</button>"
+
+    str += "<br>"
+
+    str += "</div>";
+    myForm.innerHTML = str;  
+
+
+}
+function submitReport() {
+    //alert("report submitted!");
+    var myForm = document.getElementById("inspectionForm");  
+    myForm.style.display = 'none';
+}
+function clearReport() {
+    //alert("report submitted!");
+    var myForm = document.getElementById("inspectionForm");  
+
+    document.getElementById("reportComments").value = "MMMM"; 
+
+    //myForm.style.display = 'none';
+}
+
+
+function getCenter(id) {
+    var center;
+    if (id.geometry.center!=undefined) {
+        center = id.geometry.center;
+    }
+    else {
+        if (id.geometry.coordinates[0]!=undefined) {
+            center = getCentroid(id.geometry.coordinates[0]);
+        }
+        else {
+            center == undefined;
+        }
+    }
+    if (center[0]==0) {
+        center=undefined;
+    }    
+    return center;    
+}
+
+//
+// display label at position center
+//
+function addLabel(id,label,useColor) {
+        //console.log("addLabel",label,id);
+    if (id===undefined) return;
+    if (id.properties.status == "x") return;
+    if (useColor===undefined) useColor = "black";
+    var minZoom = 15;
+    // prospect parcels are labelled using a different color
+    if (id.properties.status=="p" || id.properties.status=="a") {
+        useColor = "blue";
+        minZoom = 14.5;
+    }
+    else if (id.properties.status=="t" || id.properties.status=="T" || id.properties.status=="g") {
+        useColor = "gray";
+        minZoom = 15.5;
+    }
+    else if (id.properties.status=="r") {
+        useColor = "red";
+        minZoom = 15.5;
+    }
+    var center= getCenter(id);
+
+    // select a font to use 
+    var textFont;
+    textFont = ["Open Sans Semibold", "Arial Unicode MS Bold"];
+    //textFont = ['literal', [ 'DIN Offc Pro Italic', 'Arial Unicode MS Regular' ]];
+    // https://www.mapbox.com/mapbox-gl-js/example/display-and-style-rich-text-labels/
+
+    TCTlabels[label] = map.addLayer({
+        "id": "TCT-label_"+label,
+        "type": "symbol",
+        "source": {
+            "type": "geojson",
+            "data": 
+                {
+                "type": "FeatureCollection",
+                "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": center
+                    },
+                    "properties": {
+                        "title": label,
+                    }
+                }
+                ]
+            }
+        },
+        "minzoom": minZoom,
+        "maxzoom": 22,
+        "paint": {
+            "text-color": useColor
+        },
+        "layout": {
+            //"icon-image": "{icon}-15",
+            "text-field": "{title}",
+            "text-font": textFont,
+            "text-offset": [0, -0.5],
+            'text-size': {
+                 'property': 'status',
+                 "type":"categorical",
+                 'stops': [ ['p', 22], ['c', 44], ['a', 33], ['x', 8]  ]
+            },
+            "text-anchor": "top"
+        }
+        // https://www.mapbox.com/mapbox-gl-js/style-spec/#layers
+    });
+}
+
+
+
+
+    // TEST OF TURF LENGTH
+    // need to install turf/length first
+    // var line = turf.line([[115, -32], [131, -22], [143, -25], [150, -34]]);
+    // http://turfjs.org/docs/#length
+    // var line = turf.lineString([[115, -32], [131, -22], [143, -25], [150, -34]]);
+    // var linestring =  [[115, -32], [131, -22], [143, -25], [150, -34]];
+
+    // var disst = 'Total distance: ' + turf.lineDistance(linestring).toLocaleString() + 'km';
+
+    // var length = turf.length(line, {units: 'miles'});
+    // console.log("len=",len);
+
+
+
+</script>
+
+</body>
+</html>
