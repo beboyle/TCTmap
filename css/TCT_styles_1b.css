@@ -1,0 +1,798 @@
+ body { 
+    margin:0; 
+    padding:0; 
+    -webkit-print-color-adjust:exact;  /* to cause background colors to print */
+
+}
+/* base map */
+#map { 
+    position: absolute; 
+    top: 0em; 
+    bottom: 0; 
+    width: 100%;  
+    opacity: 1;
+    z-index: -1;
+
+}
+/* satellite map */
+#map2 { 
+    position: absolute; 
+    top: 0em; 
+    bottom: 0; 
+    width: 100%;  
+    opacity: 1;
+    z-index: -2;
+}
+
+/* title at upper right */
+#mapTitle {
+        width: 200px;
+        position: absolute;
+        top: 5px;
+        left: 40px;
+        background-color: rgba(255, 255, 255, .25);
+        padding: 5px;
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        display: block;
+
+}
+
+/* TCT_logo_380x448.png */
+#TCT_logo {
+        /*background-image: url("../images/TCT_logo_380x448.png");*/
+        position: absolute;
+        top: 110px;
+        left: 110px;
+        width: 190;
+        background-color: #cccccc;
+        background-image: radial-gradient(red, yellow);
+}
+
+
+
+    .calculation-box {
+        height: 30px;
+        width: 120px;
+        position: absolute;
+        top: 80px;
+        left: 10px;
+        background-color: rgba(255, 255, 255, .5);
+        padding: 10px 5px 5px 10px;
+        text-align: left;
+        font-family: Arial, Helvetica, sans-serif;
+        display: none;
+    }
+
+    .coords-box {
+        height: 50px;
+        width: 120px;
+        position: absolute;
+        top: 150px;
+        left: 10px;
+        background-color: rgba(255, 255, 255, .5);
+        padding: 10px 5px 5px 10px;
+        text-align: left;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 11px;
+        display: none;
+    }
+
+    p {
+        margin: 0;
+        font-size: 13px;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+
+    .buttonOn {
+        color: white;
+        background-color: #3887be;
+        cursor: pointer;
+    }
+    .buttonOff {
+        color: black;
+        background-color: #ddf;
+        cursor: pointer;
+    }
+
+
+    /* satellite icon */
+    #satellite-ctrl {
+        position: absolute;
+        width: 50px;
+        margin: 0px;
+        vertical-align: top;  
+        left: 5px;
+        bottom: 55px;
+        padding: 0px 5px 5px 5px;
+        cursor: pointer;
+        display: block;    /* hide at first */
+    }
+    #satellite-ctrl-img {
+        width: 50px;
+    }
+    /* map icon */
+    #map-ctrl {
+        position: absolute;
+        width: 50px;
+        margin: 0px;
+        vertical-align: top;  
+        left: 5px;
+        bottom: 55px;
+        padding: 0px 5px 5px 5px;
+        cursor: pointer;
+        display: none; /* show at first */
+    }
+    #map-ctrl-img {
+        width: 50px;
+    }
+
+    /* menu - burger icon */
+    #menu-ctrl {
+        position: absolute;
+        width: 30px;
+        margin: 0px;
+        vertical-align: top;  
+        left: 1px;
+        top: 5px;
+        padding: 0px 5px 5px 5px;
+        cursor: pointer;        
+    }
+    /* the bar of menu items (shown from burger icon) */
+    #controlBar {
+        background: rgba(200, 200, 200, 0.85); 
+        padding: 5px;
+        position: absolute;
+        top: 5px;
+        left: 40px;
+        z-index: 1;
+        display: none;    /* hide at first */
+    }
+
+    /* documents icon */
+    #documents-ctrl {
+        position: absolute;
+        width: 30px;
+        margin: 0px;
+        vertical-align: top;  
+        left: 1px;
+        top: 36px;
+        padding: 0px 5px 5px 5px;
+        cursor: pointer;        
+    }
+    /* the bar of documents items */
+    #documentsBar {
+        background: rgba(200, 200, 200, 0.85); 
+        padding: 5px;
+        position: absolute;
+        top: 36px;
+        left: 40px;
+        z-index: 1;
+        display: none;    /* hide at first */
+    }
+
+    /* slideshow icons */
+    #slideshow-ctrlNY {         /* NY is just for demo purposes */
+        position: absolute;
+        width: 30px;
+        margin: 0px;
+        vertical-align: top;  
+        left: 1px;
+        top: 175px;
+        padding: 0px 5px 5px 5px;
+        cursor: pointer;        
+    }
+    #slideshow-ctrlTruro {
+        position: absolute;
+        width: 30px;
+        margin: 0px;
+        vertical-align: top;  
+        left: 1px;
+        top: 142px;
+        padding: 0px 5px 5px 5px;
+        cursor: pointer;        
+    }
+
+    #coordinatesDiv {
+            position: absolute;
+            bottom: 5px;
+            z-index: 1;    
+    }
+
+    .filter-ctrl {
+        position: absolute;
+        top: 0px;
+        right: 175px;
+        z-index: 1;
+        width: 100px;
+    }
+
+    .filter-ctrl input[type=text] {
+        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        width: 90%;
+        border: 0;
+        background-color: #fff;
+        height: 10px;
+        margin: 0px 10px 0px 0px;
+        color: rgba(0,0,0,.5);
+        padding: 5px 10px 5px 10px;
+        box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+        border-radius: 3px;
+    }
+    .filter1-ctrl {
+        position: absolute;
+        top: 0px;
+        right: 60px;
+        z-index: 1;
+        width: 100px;
+    }
+
+    .filter1-ctrl input[type=text] {
+        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        width: 90%;
+        border: 0;
+        background-color: #fff;
+        height: 12px;
+        margin: 0px 10px 0px 0px;
+        color: rgba(0,0,0,.5);
+        padding: 5px 10px 5px 10px;
+        box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+        border-radius: 3px;
+    }
+
+    /* turns on/off layers*/
+    #layers-ctrl {
+        position: absolute;
+        width: 30px;
+        margin: 0px;
+        vertical-align: top;  
+        left: 5px;
+        top: 72px;
+        cursor: pointer;        
+    }
+    /* this is the layer menu */
+    #menu {
+        /* background: #fff; 
+        background: rgba(128, 128, 128, 0.1); */
+        background: rgba(255, 255, 255, 0.4); 
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        top: 72px;
+        left: 40px;
+        border-radius: 3px;
+        /*width: 500px;*/
+        border: 0px solid rgba(0,0,0,0.4);
+        font-family: 'Open Sans', sans-serif;
+        display:none;    /* hide at first */
+
+    }
+    #menu a {
+        font-size: 12px;
+        color: #3074a4; 
+        display: inline;    /* display: block; for vertical display */
+        margin: 2px;
+        padding: 2px;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(0,0,0,0.5);
+        border-right: 1px solid rgba(0,0,0,0.5);
+        border-top: 1px solid rgba(0,0,0,0.1);
+        border-left: 1px solid rgba(0,0,0,0.1);
+        border-radius: 3px;
+        border: 1px solid rgba(0,0,255,0.5);
+        text-align: center;
+    }
+    #menu a:last-child {
+        /* border: none; */
+    }
+    #menu a:hover {
+        background-color: #f8f8f8;
+        /* color: #404040; 
+        color: #f00;  */
+    }
+    #menu a.active {
+        background-color: #3887be;
+        color: #ffffff;
+    }
+    #menu a.active:hover {
+        background: #3074a4;
+    }
+
+    #legend {
+            /*height: 125px;*/
+            width: 130px;
+            position: absolute;
+            /*.  SET DYNAMICALLY
+            bottom: 222px;
+            left: 10px;
+            */
+            background-color: rgba(220, 220, 220, .75);
+            padding: 5px 5px 5px 8px;
+            text-align: left;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
+    }    
+
+    #teams {
+            /*height: 125px;*/
+            width: 70px;
+            position: absolute;
+            /*.  SET DYNAMICALLY
+            left: 350px;
+            */
+            bottom: 222px;
+            background-color: rgba(220, 220, 220, .75);
+            padding: 5px 5px 5px 8px;
+            text-align: left;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
+    }   
+
+
+    .smaller {
+        font-size: 85%;
+    }
+    .smaller10 {
+        font-size: 10px;
+    }
+
+/* search icon */
+#search-ctrl {
+    position: absolute;
+    width: 30px;
+    margin: 0px;
+    vertical-align: top;  
+    left: 7px;
+    top: 106px;
+}
+
+#searchPromptModalDiv {
+    position: absolute;
+    width: 100px;
+    height: 20px;    
+    margin: 0px;
+    vertical-align: top;  
+    left: 40px;
+    top: 106px;
+    background: rgba(255, 255, 255, 0.4); 
+    display: none;
+
+
+}
+#searchPromptModalInput {
+    position: absolute;
+    width: 110px;
+    height: 20px;    
+    margin: 0px;
+    padding: 1px;
+    vertical-align: top;  
+    left: 0px;
+    top: 0px;
+    background: rgba(242, 242, 255, 0.9); 
+    display: none;
+    z-index: 9;
+}
+#searchPromptModalCancelBtn {
+    position: absolute;
+    width: 50px;
+    height: 20px;    
+    margin: 3px;
+    padding: 3px;
+    vertical-align: middle;  
+    left: 2px;
+    top: 25px;
+    background: rgba(255, 255, 255, 0.9); 
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: gray;
+    display: none;
+}
+#searchPromptModalOkBtn {
+    position: absolute;
+    width: 50px;
+    height: 20px;    
+    margin: 3px;
+    padding: 3px;
+    vertical-align: middle;  
+    left: 55px;
+    top: 25px;
+    background: rgba(22, 22, 255, 0.7); 
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    display: none;
+    color: #fff;
+}
+
+#searchPromptModalHelp {
+    position: absolute;
+    width: 310px;
+    height: 35px;
+    padding: 6px;
+    margin: 0px;
+    vertical-align: middle;  
+    left: 166px;
+    top: 107px;
+    background: rgba(255, 255, 255, 0.4); 
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    display: none;
+}
+
+    #help {
+        height: 110px;
+        width: 100%;
+        position: absolute;
+        top: 26px;
+        left: 0px;
+        background-color: rgba(255, 255, 255, .5);
+        padding: 5px 5px 5px 10px;
+        text-align: left;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+    }    
+    #helpText {
+        /*height: 110px; 
+        width: 50%;  */
+        position: absolute;
+        top: 165px;
+        left: 10px;
+        background-color: rgba(255, 255, 255, .5);
+        padding: 5px 5px 5px 10px;
+        text-align: left;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+        z-index: 1;
+
+
+    }  
+
+
+/* LOWER LEFT CORNER */
+
+/* mouse coordinates box - lng, lat */
+.coordinatesCursor {
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    position: absolute;
+    bottom: 4px;
+    left: 98px;
+    padding:2px;
+    margin: 0;
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 16px;
+    border-radius: 3px;
+    display: block;
+    text-align: center;
+    width: 155px;
+}
+
+/* x y screen coordinates and dims */
+#coordinatesIdXY {
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    position: absolute;
+    bottom: 4px;
+    /*left: 760px;*/
+    left: 758px;
+    padding:2px;
+    margin: 0;
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 16px;
+    border-radius: 3px;
+    display: none;
+    text-align: center;
+    width: 155px;
+}
+
+
+/* clicked at coordinates box */
+.coordinatesClicked {
+    background: rgba(0,0,0,0.5);
+    color: cyan;
+    position: absolute;
+    bottom: 4px;
+    left: 265px;
+    padding:2px;
+    margin: 0;
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 16px;
+    border-radius: 3px;
+    display: block;
+    text-align: center;
+    width: 155px;
+}
+
+/* distance measurement is displayed */
+.distance-container {
+    z-index: 1;
+    background: rgba(0,0,0,0.5);
+    color: rgba(255,192,203);
+    position: absolute;
+    bottom: 35px;
+    left: 265px;
+    padding:2px;
+    margin: 0;
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 16px;
+    border-radius: 3px;
+    display: block;
+    text-align: center;
+    width: 155px;
+}
+
+    /* show zoom level */
+    #zoomDiv {
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            position: absolute;
+            bottom: 35px;
+            left: 98px;
+            padding:2px;
+            margin: 0;
+            font-size: 12px;
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 16px;
+            border-radius: 3px;
+            display: block;
+            text-align: center;
+            width: 155px;
+    }
+
+
+
+#needsInspection {
+    background: rgba(30,30,90,0.25);
+    border-radius: 3px;
+    text-align: center;
+    padding:5px;
+    color: blue;
+}
+#inspectionForm {
+    background: rgba(30,30,90,0.75);
+    border-radius: 3px;
+    text-align: left;
+    padding: 10px;
+    color: white;    
+}
+.inspectionForm-container {
+        z-index: 9;
+        background: rgba(0,0,0,0.75);
+        color: black;
+        position: absolute;
+        bottom: 5px;
+        left: 450px;
+        padding:5px;
+        margin: 0;
+        font-size: 12px;
+        font-family: Arial, Helvetica, sans-serif;
+        line-height: 18px;
+        border-radius: 3px;
+        display: none;
+        text-align: left;
+        width: 255px;  
+}
+
+
+#submitReportBtn {
+    border-radius: 3px;
+    border: 3px;
+    border-color: pink;
+    background: rgba(222,222,222,0.75);
+    padding: 5px;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    margin-right: 10px;
+
+    color: black;
+
+}
+#clearReportBtn {
+    border-radius: 3px;
+    border: 3px;
+    border-color: pink;
+    background: rgba(222,222,222,0.75);
+    padding: 5px;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    margin-left: 10px;
+
+    color: black;
+
+}
+
+
+
+/* for satellite imagery overlay 
+https://bl.ocks.org/danswick/995de3964b179bd4c283d79cf42ece03
+*/
+#remover {
+    margin: 0 auto;
+    background-color: green;
+    color: #fff;
+
+        font-size: 12px;
+        font-family: Arial, Helvetica, sans-serif;
+
+    padding: 3px;
+    border: 1px solid #fff;
+    border-radius: 3px;
+    box-shadow: 0px 0px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+    position: absolute;
+    right: 50px;
+    top: 84px;
+}
+#remover:hover {
+    background-color: darkgreen;
+}
+
+#report {
+    border-style: solid;
+    border-width: 5px;
+    border-color: red;
+}
+.report {
+    border-style: solid;
+    border-width: 5px;
+    border-color: red;   
+}
+
+.pad3 {
+    padding: 3px;
+}
+
+.rowCR {
+       background: #888 !important;
+}
+
+#gameKeyHelp {
+    position: absolute;
+    width: 210px;
+    bottom: 0px;
+    right: 0px;
+    padding: 0px 5px 15px 10px;
+    z-index: 1;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    display: block;
+}
+
+#map-overlay-container {
+    position: absolute;
+    width: 200px;
+    top: 5px;
+    left: 5px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgba(100,100,100,0.85);
+    display: none;
+    padding: 5px;
+
+ }   
+/*
+
+#map-overlay {
+        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    background-color: #fff;
+    border-radius: 3px;
+    padding: 10px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.20);
+}
+*/
+
+#location-title {
+    height: 30px;
+    font-size: 22px;
+    font-weight: bold;    
+    padding: 0px;
+    color: #f3f3f3;
+
+}
+#location-description {
+    /*overflow: auto; */   
+    height: 200px;
+    font-size: 12px;
+    padding: 0px;
+    color: #f3f3f3;
+
+
+}
+#location-link {
+    height: 25px;
+    font-size: 10px;
+    padding: 0px;
+    color: #f3f3f3;
+
+
+}
+#location-images {
+
+    padding: 0px 0px 0px 0px;
+    /*box-shadow:0 1px 2px rgba(0,0,0,0.20);*/
+}
+
+#gpsFile {
+    position: absolute;
+    top: 10px;
+    left: 360px;
+    display: none;    
+}
+#gpsFileInput {
+    background-color: rgba(233,233,233,0.8);    
+}
+
+
+#gpsFileHelpDiv {
+    position: absolute;
+    padding: 5px;
+    width: 400px;    
+    top: 30px;
+    left: 360px;
+    display: none;  
+    background-color: rgba(240,240,240,0.85);  
+    font-family: Arial, Helvetica, sans-serif;
+
+}
+
+#screenFile {
+    position: absolute;
+    top: 10px;
+    left: 360px;
+    display: none;    
+}
+#screenFileInput {
+    background-color: rgba(233,233,233,0.8);    
+}
+
+#screenImg {
+    position: absolute;
+    top: 100px;
+    left: 200px;    
+}
+#screenCoords {
+    position: absolute;
+    top: 100px;
+    left: 60px; 
+    background-color: rgba(233,233,233,0.8); 
+    padding: 5px;
+}
+#lonLatInput {
+    display: none;        
+}
+#screenCoordLon {
+    position: absolute;
+    top: 64px;
+    left: 50px; 
+    width: 70px;    
+}
+#screenCoordLat {
+    position: absolute;
+    top: 64px;
+    left: 130px;    
+    width: 70px;         
+}
+#screenCoordInstruct {
+    position: absolute;
+    top: 64px;
+    left: 210px;  
+    width: 300px;         
+}
+
+
+#screenCoordsBtns {
+    position: absolute;
+    top: 64px;
+    left: -100px;      
+}
+
+

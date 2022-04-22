@@ -1,0 +1,121 @@
+
+/* FONT STYLING */
+
+.italics {
+    font-style: italic;    
+}
+.smaller {
+    font-size: 80%;    
+}
+.smaller2 {
+    font-size: 65%;    
+}
+.subdue {
+  color: lightgray;         
+}
+.textBlack {
+  color: black;
+}
+.textGray {
+  color: gray;
+}
+.textLightGray {
+  color: lightgray;
+}
+.textRed {
+  color: red;
+}
+.textPurple {
+  color: purple;
+}
+.textOrange {
+  color: orange;
+}
+.textBlue {
+  color: blue;
+}
+.textGreen {
+  color: green;
+}
+.textLightgreen {
+  color: green;
+}
+
+
+    .textCyan {
+        color: cyan;
+    }
+    .textMagenta {
+        color: magenta;
+    }
+
+
+/* BACKGROUND AND FONT STYLING */
+
+.grayedDown {
+  background-color: #eeeeee;    
+  color: red;  
+}
+.subtotal {
+  background-color: #dddddd;
+  color: blue;
+  border-top: 1px solid;  
+}
+.total {
+  background-color: #eeeeee;
+  color: purple;
+  border-top: 2px double;
+  border-bottom: 2px double;
+  font-style: bold;
+}
+.subheader {
+  background-color: #dddddd;
+  color: blue;    
+}
+
+
+/* BACKGROUNDS */
+
+.backgroundPink {
+  background: pink; 
+}
+.backgroundYellow{
+  background: yellow; 
+}
+.background-gray {
+  background: lightgray;
+}
+.background-green {
+  background: lightgreen;
+}
+.background-blue {
+  background: lightblue;  /* about 79% */
+}
+.background-lighterblue {
+  background: #c5e2ed; /* was AliceBlue about 85%*/
+}
+.background-lighterblue95 {
+  background: #ebf6f9; 
+}
+
+
+
+
+
+/* ALIGNMENT */
+
+.textLeft {
+  text-align: left;
+}
+.textCenter {
+  text-align: center;
+}
+.textRight {
+  text-align: right;
+}
+.alignCenter {
+  text-align: center;
+}
+.alignRight {
+  text-align: right;
+}
